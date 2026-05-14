@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTokクイズ</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#111827,#ec4899);
+  color:#fff;
+  min-height:100vh;
+}
+
+header{text-align:center;padding:30px 15px}
+header h1{
+  font-size:42px;
+  color:#25F4EE;
+  margin-bottom:10px;
+  text-shadow:2px 2px 0 #FE2C55;
+}
+header p{
+  font-weight:bold;
+  color:#fce7f3;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+
+.ad-area{
+  background:#fff;
+  padding:15px;
+  border-radius:18px;
+  margin-bottom:20px;
+}
+
+.quiz-box{
+  background:#1f2937;
+  border-radius:24px;
+  padding:25px;
+  box-shadow:0 10px 25px rgba(0,0,0,.35);
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.badge,.score{
+  padding:10px 18px;
+  border-radius:999px;
+  font-weight:bold;
+}
+
+.badge{
+  background:#25F4EE;
+  color:#111827;
+}
+
+.score{
+  background:#22c55e;
+  color:#052e16;
+}
+
+.progress{
+  width:100%;
+  height:12px;
+  background:#374151;
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:25px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#25F4EE,#FE2C55);
+  transition:.3s;
+}
+
+#question{
+  font-size:28px;
+  font-weight:bold;
+  line-height:1.6;
+  margin-bottom:25px;
+}
+
+.choices{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.choice-btn{
+  border:none;
+  background:#374151;
+  color:#fff;
+  border:2px solid #25F4EE;
+  padding:18px;
+  border-radius:18px;
+  cursor:pointer;
+  font-size:17px;
+  font-weight:bold;
+  transition:.2s;
+}
+
+.choice-btn:hover{
+  background:#4b5563;
+  transform:translateY(-2px);
+}
+
+.correct{
+  background:#22c55e!important;
+  border-color:#22c55e!important;
+  color:#052e16!important;
+}
+
+.wrong{
+  background:#ef4444!important;
+  border-color:#ef4444!important;
+}
+
+#result{
+  margin-top:22px;
+  font-size:22px;
+  font-weight:bold;
+  min-height:40px;
+}
+
+.final{
+  text-align:center;
+  padding:40px 10px;
+}
+
+.final h2{
+  font-size:40px;
+  margin-bottom:20px;
+  color:#25F4EE;
+}
+
+.final p{
+  font-size:24px;
+  margin-bottom:20px;
+}
+
+.restart-btn{
+  border:none;
+  background:#FE2C55;
+  color:#fff;
+  padding:15px 30px;
+  border-radius:999px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+@media(max-width:700px){
+  .choices{
+    grid-template-columns:1fr;
+  }
+
+  #question{
+    font-size:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎵 TikTokクイズ 🎵</h1>
+  <p>150問の中からランダム50問出題！回答後は自動で次へ進みます</p>
+</header>
+
+<div class="container">
+
+<div class="ad-area">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8398161859137802"
+     crossorigin="anonymous"></script>
+<!-- チェス -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8398161859137802"
+     data-ad-slot="5599163841"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+
+<div class="quiz-box" id="quizBox">
+
+<div class="top">
+  <div class="badge" id="count">1 / 50</div>
+  <div class="score" id="score">正解数 0</div>
+</div>
+
+<div class="progress">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div id="question"></div>
+<div class="choices" id="choices"></div>
+<div id="result"></div>
+
+</div>
+</div>
+
+<script>
+const quizData = [
+{q:"TikTokは主にどんな動画アプリ？",choices:["短い動画","映画専用","ニュース専用","地図アプリ"],a:"短い動画"},
+{q:"TikTokで動画を見るためによく使う動作は？",choices:["スワイプ","印刷","削除","保存"],a:"スワイプ"},
+{q:"TikTokで動画投稿する人を何と呼ぶことが多い？",choices:["TikToker","実況者","DJ","編集長"],a:"TikToker"},
+{q:"TikTokの動画で人気になりやすいものは？",choices:["短くテンポが良い動画","3時間の無音動画","文字だけ","真っ暗な画面"],a:"短くテンポが良い動画"},
+{q:"TikTokで動画に使われることが多いものは？",choices:["音楽","税金","地図","契約書"],a:"音楽"},
+{q:"TikTokで動画に音を追加することを何という？",choices:["楽曲設定","通話","保存","印刷"],a:"楽曲設定"},
+{q:"TikTokで人気動画に使われやすい音源は？",choices:["流行曲","校歌","時報","警報"],a:"流行曲"},
+{q:"TikTokで動画を応援するために押すものは？",choices:["いいね","終了","削除","閉じる"],a:"いいね"},
+{q:"TikTokで投稿者を応援する機能は？",choices:["フォロー","ブロック","削除","印刷"],a:"フォロー"},
+{q:"TikTokで動画に書き込めるものは？",choices:["コメント","請求書","答案","領収書"],a:"コメント"},
+
+{q:"TikTokで人気動画が表示される場所は？",choices:["おすすめ","設定","保存","履歴書"],a:"おすすめ"},
+{q:"TikTokの『おすすめ』に表示される理由に近いものは？",choices:["人気や視聴履歴","住所","血液型","郵便番号"],a:"人気や視聴履歴"},
+{q:"TikTokで動画を保存する機能は？",choices:["お気に入り","削除","閉じる","通報"],a:"お気に入り"},
+{q:"TikTokで他人の動画を自分の動画に使う機能は？",choices:["デュエット","印刷","配送","通話"],a:"デュエット"},
+{q:"TikTokで他人の動画を横に並べて撮る機能は？",choices:["コラボ機能","地図機能","検索機能","翻訳機能"],a:"コラボ機能"},
+{q:"TikTokで動画に文字を入れることは？",choices:["テロップ","削除","圧縮","翻訳"],a:"テロップ"},
+{q:"TikTok動画でよく重視されるものは？",choices:["テンポ","静止画だけ","長文","無音"],a:"テンポ"},
+{q:"TikTokで人気になりやすい動画時間に近いものは？",choices:["短時間","5時間","10時間","24時間"],a:"短時間"},
+{q:"TikTokで流行するダンス動画を何という？",choices:["ダンスチャレンジ","避難訓練","朗読会","株取引"],a:"ダンスチャレンジ"},
+{q:"TikTokで流行を広げるきっかけになるものは？",choices:["バズ","会計","診察","印刷"],a:"バズ"},
+
+{q:"『バズる』とは何を意味する？",choices:["急に人気が出る","壊れる","削除される","停止する"],a:"急に人気が出る"},
+{q:"TikTokで再生数が多いことを示す数字は？",choices:["再生回数","体重","速度","年齢"],a:"再生回数"},
+{q:"TikTokで動画を見る人を何という？",choices:["視聴者","審判","監督","教師"],a:"視聴者"},
+{q:"TikTokで人気投稿者に付きやすいマークは？",choices:["認証バッジ","切符","免許証","保険証"],a:"認証バッジ"},
+{q:"TikTokでライブ配信を行うことは？",choices:["TikTok LIVE","印刷","削除","保存"],a:"TikTok LIVE"},
+{q:"ライブ中に視聴者が送れるものは？",choices:["ギフト","税金","地図","診断書"],a:"ギフト"},
+{q:"TikTokライブで視聴者と交流する場所は？",choices:["コメント欄","冷蔵庫","駅","病院"],a:"コメント欄"},
+{q:"TikTokでライブ中に送られる応援アイテムは？",choices:["投げ銭ギフト","切符","レシート","答案"],a:"投げ銭ギフト"},
+{q:"TikTokでライブ配信する目的に近いものは？",choices:["視聴者交流","道路工事","税務処理","裁判"],a:"視聴者交流"},
+{q:"TikTokで視聴者を増やすため重要なものは？",choices:["継続投稿","一回だけ投稿","無投稿","無音"],a:"継続投稿"},
+
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["ダンス","税法","地図作成","数学のみ"],a:"ダンス"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["おもしろ動画","裁判","会計","工事"],a:"おもしろ動画"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["メイク","道路工事","交通整理","通院"],a:"メイク"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["料理","契約書解説","測量","株主総会"],a:"料理"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["ペット動画","税務申告","住民票","保険"],a:"ペット動画"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["あるあるネタ","裁判記録","道路標識","契約書"],a:"あるあるネタ"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["ライフハック","時刻表","校則","戸籍"],a:"ライフハック"},
+{q:"ライフハック動画とは？",choices:["生活に役立つ工夫","料理だけ","歌だけ","旅行だけ"],a:"生活に役立つ工夫"},
+{q:"TikTokで人気の動画ジャンルに多いものは？",choices:["ASMR","工事","会議","税務"],a:"ASMR"},
+{q:"ASMR動画で重視されるものは？",choices:["音","地図","点数","税率"],a:"音"},
+
+{q:"TikTokで『おすすめ』に載るため重要なものは？",choices:["視聴維持","住所","血液型","年齢だけ"],a:"視聴維持"},
+{q:"動画を最後まで見てもらう割合を何という？",choices:["視聴維持率","通勤率","税率","合格率"],a:"視聴維持率"},
+{q:"TikTok動画で最初に重要な部分は？",choices:["冒頭","最後だけ","概要欄","コメント欄"],a:"冒頭"},
+{q:"TikTokで視聴者を引きつけるために大切なのは？",choices:["最初の数秒","最後の1秒だけ","静止画","無音"],a:"最初の数秒"},
+{q:"TikTokで使われることが多い縦型画面比率は？",choices:["9:16","16:9","4:3","1:1"],a:"9:16"},
+{q:"TikTok動画で大切な編集に近いものは？",choices:["テンポの良いカット","長い無音","黒画面","静止のみ"],a:"テンポの良いカット"},
+{q:"TikTok動画で画面に表示される短い文章は？",choices:["テキスト","領収書","住所","契約書"],a:"テキスト"},
+{q:"TikTokで動画検索に使うものは？",choices:["ハッシュタグ","切符","免許証","住民票"],a:"ハッシュタグ"},
+{q:"『#おすすめ』のようなものを何という？",choices:["ハッシュタグ","レシート","定規","診断書"],a:"ハッシュタグ"},
+{q:"TikTokで流行中のテーマを探す機能は？",choices:["トレンド","税率","交通情報","天気予報"],a:"トレンド"},
+
+{q:"TikTokでダンス動画に重要なものは？",choices:["リズム感","税知識","道路標識","暗算"],a:"リズム感"},
+{q:"TikTokで口パク動画を何ということがある？",choices:["リップシンク","スクリーンショット","ライブ配信","ダウンロード"],a:"リップシンク"},
+{q:"TikTokで変顔やリアクション動画に近いものは？",choices:["リアクション系","ニュース系","天気系","裁判系"],a:"リアクション系"},
+{q:"TikTokで料理動画に多い特徴は？",choices:["短くわかりやすい","3時間以上","音なし","白紙"],a:"短くわかりやすい"},
+{q:"TikTokでメイク動画によくある内容は？",choices:["ビフォーアフター","道路工事","天気予報","試験"],a:"ビフォーアフター"},
+{q:"TikTokでファッション動画に多い内容は？",choices:["コーデ紹介","税務申告","野球解説","交通整理"],a:"コーデ紹介"},
+{q:"TikTokで部屋紹介動画を何という？",choices:["ルームツアー","卒業式","会計","避難訓練"],a:"ルームツアー"},
+{q:"TikTokで勉強動画に多いものは？",choices:["勉強法紹介","工事","料理だけ","裁判"],a:"勉強法紹介"},
+{q:"TikTokで旅行動画に多いものは？",choices:["観光地紹介","税率解説","法律相談","工場紹介"],a:"観光地紹介"},
+{q:"TikTokでペット動画が人気な理由に近いものは？",choices:["癒やし","税金","工事","通院"],a:"癒やし"},
+
+{q:"TikTokで動画をシェアする目的に近いものは？",choices:["他の人に見せる","削除する","隠す","停止する"],a:"他の人に見せる"},
+{q:"TikTokで他SNSへ動画を送ることは？",choices:["共有","診察","印刷","測量"],a:"共有"},
+{q:"TikTokで人気クリエイター同士が一緒に動画を撮ることは？",choices:["コラボ","削除","会計","配送"],a:"コラボ"},
+{q:"TikTokでフォロワーを増やすため重要なことは？",choices:["定期投稿","無投稿","無音","真っ黒画面"],a:"定期投稿"},
+{q:"TikTokでコメント返信動画を作ることは？",choices:["返信動画","領収書","通知書","診断書"],a:"返信動画"},
+{q:"TikTokでフォロワーとの交流に重要なのは？",choices:["コミュニケーション","無視","削除だけ","非公開"],a:"コミュニケーション"},
+{q:"TikTokで動画説明を書く場所は？",choices:["キャプション","通帳","契約書","免許証"],a:"キャプション"},
+{q:"TikTokで人気曲を使う利点に近いものは？",choices:["見てもらいやすい","必ず削除される","無音になる","投稿不可"],a:"見てもらいやすい"},
+{q:"TikTokで流行中の曲を使うことを何ということがある？",choices:["トレンド音源を使う","工事する","裁判する","配送する"],a:"トレンド音源を使う"},
+{q:"TikTokで動画を保存して後で見る機能は？",choices:["お気に入り","印刷","削除","閉じる"],a:"お気に入り"},
+
+{q:"TikTokで収益化に関係するものは？",choices:["クリエイター収益","税金","地図","病院"],a:"クリエイター収益"},
+{q:"TikTokで企業が商品を紹介してもらう動画は？",choices:["PR案件","卒業式","交通整理","健康診断"],a:"PR案件"},
+{q:"PR案件動画で必要なことは？",choices:["広告であることを示す","隠す","削除する","無音にする"],a:"広告であることを示す"},
+{q:"TikTokで人気になると増える可能性があるものは？",choices:["案件依頼","通院","工事","税務"],a:"案件依頼"},
+{q:"TikTokで自分の商品を宣伝する動画は？",choices:["プロモーション動画","避難訓練","点呼","健康診断"],a:"プロモーション動画"},
+{q:"TikTokで企業アカウントが投稿する目的は？",choices:["宣伝","裁判","測量","印刷"],a:"宣伝"},
+{q:"TikTokショップに近い機能は？",choices:["商品販売","病院予約","工事予約","交通案内"],a:"商品販売"},
+{q:"TikTokでライブ販売を行うことは？",choices:["ライブコマース","道路工事","税務処理","裁判"],a:"ライブコマース"},
+{q:"TikTokでフォロワーが多い人は？",choices:["インフルエンサー","裁判官","駅員","医師"],a:"インフルエンサー"},
+{q:"インフルエンサーの影響力とは？",choices:["多くの人に影響を与える力","道路を作る力","税率を変える力","印刷する力"],a:"多くの人に影響を与える力"},
+
+{q:"TikTokで迷惑行為を投稿することは？",choices:["問題行動","良い企画","推奨行為","公式ルール"],a:"問題行動"},
+{q:"TikTokで他人を傷つけるコメントは？",choices:["誹謗中傷","応援","高評価","共有"],a:"誹謗中傷"},
+{q:"TikTokで他人の動画を無断使用すると問題になるものは？",choices:["著作権","視聴率","速度","年齢"],a:"著作権"},
+{q:"TikTokで個人情報を公開しすぎることは？",choices:["危険","安全","推奨","必須"],a:"危険"},
+{q:"TikTokで他人の顔を無断投稿すると関係する権利は？",choices:["肖像権","所有権","通行権","投票権"],a:"肖像権"},
+{q:"TikTokで炎上とは？",choices:["批判が広がること","動画が保存されること","音が消えること","画質が上がること"],a:"批判が広がること"},
+{q:"TikTokで信頼される投稿に必要なことは？",choices:["正確な情報","噂だけ","無断転載","嘘"],a:"正確な情報"},
+{q:"TikTokでマナーとして大切なのは？",choices:["他人を尊重する","迷惑行為","なりすまし","誹謗中傷"],a:"他人を尊重する"},
+{q:"TikTokで年齢制限が関係する理由に近いものは？",choices:["安全性","税金","速度","距離"],a:"安全性"},
+{q:"TikTokを安全に楽しむために必要なのは？",choices:["ルールを守る","迷惑行為","無断転載","誹謗中傷"],a:"ルールを守る"},
+
+{q:"TikTokでスマホ撮影時に重要なのは？",choices:["手ブレ対策","靴の色","机の高さ","住所"],a:"手ブレ対策"},
+{q:"TikTokで画面を明るく映すため使うものは？",choices:["照明","鍋","定規","封筒"],a:"照明"},
+{q:"TikTok動画で音をきれいに録る機材は？",choices:["マイク","炊飯器","冷蔵庫","掃除機"],a:"マイク"},
+{q:"TikTokで撮影内容を考えることは？",choices:["企画","裁判","測量","会計"],a:"企画"},
+{q:"TikTok動画で大切なものは？",choices:["見やすさ","長すぎる説明","無音","真っ黒画面"],a:"見やすさ"},
+{q:"TikTokで人気になるために必要なことは？",choices:["改善を続ける","一回だけ投稿","迷惑行為","無断転載"],a:"改善を続ける"},
+{q:"TikTok動画の分析を見る目的は？",choices:["改善点を知る","削除するため","隠すため","印刷するため"],a:"改善点を知る"},
+{q:"TikTokで視聴者が多い時間に投稿する理由は？",choices:["見てもらいやすい","必ず削除される","音が消える","投稿不可"],a:"見てもらいやすい"},
+{q:"TikTokで継続的に人気を得るため大切なのは？",choices:["継続と工夫","無投稿","誹謗中傷","迷惑行為"],a:"継続と工夫"},
+{q:"TikTokを楽しむ上で大切なのは？",choices:["安全に楽しむこと","迷惑行為","無断転載","嘘の投稿"],a:"安全に楽しむこと"}
+];
+
+const TOTAL = 50;
+
+let selectedQuestions = [];
+let current = 0;
+let score = 0;
+
+const questionEl = document.getElementById("question");
+const choicesEl = document.getElementById("choices");
+const resultEl = document.getElementById("result");
+const countEl = document.getElementById("count");
+const scoreEl = document.getElementById("score");
+const progressBar = document.getElementById("progressBar");
+const quizBox = document.getElementById("quizBox");
+
+function shuffle(array){
+  const arr = [...array];
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function generateQuestions(){
+  selectedQuestions = shuffle(quizData).slice(0,TOTAL);
+}
+
+function showQuestion(){
+  const q = selectedQuestions[current];
+
+  resultEl.innerHTML = "";
+  questionEl.innerHTML = q.q;
+  countEl.innerHTML = (current+1) + " / " + TOTAL;
+  scoreEl.innerHTML = "正解数 " + score;
+  progressBar.style.width = ((current)/TOTAL)*100 + "%";
+
+  choicesEl.innerHTML = "";
+
+  shuffle(q.choices).forEach(choice=>{
+    const btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.innerHTML = choice;
+    btn.onclick = () => checkAnswer(btn,choice,q.a);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn,selected,correct){
+
+  const buttons = document.querySelectorAll(".choice-btn");
+
+  buttons.forEach(b=>{
+    b.disabled = true;
+
+    if(b.innerHTML === correct){
+      b.classList.add("correct");
+    }
+  });
+
+  if(selected === correct){
+    score++;
+    btn.classList.add("correct");
+    resultEl.innerHTML = "✅ 正解！";
+    resultEl.style.color = "#22c55e";
+  }else{
+    btn.classList.add("wrong");
+    resultEl.innerHTML = "❌ 不正解！ 正解は「" + correct + "」";
+    resultEl.style.color = "#ef4444";
+  }
+
+  scoreEl.innerHTML = "正解数 " + score;
+
+  progressBar.style.width = ((current+1)/TOTAL)*100 + "%";
+
+  setTimeout(()=>{
+    current++;
+
+    if(current >= TOTAL){
+      showFinal();
+    }else{
+      showQuestion();
+    }
+
+  },900);
+}
+
+function showFinal(){
+
+  const percent = Math.round((score/TOTAL)*100);
+
+  quizBox.innerHTML = `
+  <div class="final">
+    <h2>🎉 クイズ終了！</h2>
+    <p>${score} / ${TOTAL} 問正解！</p>
+    <p>正答率 ${percent}%</p>
+    <button class="restart-btn" onclick="location.reload()">もう一度遊ぶ</button>
+  </div>
+  `;
+}
+
+generateQuestions();
+showQuestion();
+</script>
+
+</body>
+</html>
